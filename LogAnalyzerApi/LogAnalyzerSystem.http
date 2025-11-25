@@ -1,0 +1,14 @@
+@LogAnalyzerSystem_HostAddress = http://localhost:5045
+
+POST {{LogAnalyzerSystem_HostAddress}}/api/log/add-task
+Content-Type: application/json
+
+{
+  "logs": "[2025-11-23 10:00:00] ERROR: Database connection failed\n[2025-11-23 10:00:01] WARNING: Retry attempt 1 \n[2025-11-23 10:00:05] ERROR: Connection timeout \n[2025-11-24 12:00:05] INFO: Database connected",
+  "type": "Performance"
+}
+### 
+
+GET {{LogAnalyzerSystem_HostAddress}}/api/log/result/1d46bf1f-2b6a-4e8a-86b7-fe5d5584285c
+Accept: application/json
+###
