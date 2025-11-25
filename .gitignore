@@ -1,21 +1,17 @@
-# Build results
 bin/
 obj/
 *.user
 *.suo
 
-# Secrets (ВАЖНО!)
 appsettings.Development.json
 appsettings.*.json
 !appsettings.json
 
-# IDE
 .vs/
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
 .DS_Store
 Thumbs.db
