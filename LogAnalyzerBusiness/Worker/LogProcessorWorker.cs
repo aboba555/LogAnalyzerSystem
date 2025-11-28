@@ -2,13 +2,14 @@ using System.ComponentModel;
 using System.Threading.Channels;
 using LogAnalyzerBusiness.Services.Gpt;
 using LogAnalyzerBusiness.Services.LogParsing;
+using LogAnalyzerBusiness.Services.RateLimit;
 using LogAnalyzerBusiness.Services.ResultStore;
 using LogAnalyzerData.Models.Enums;
 using Microsoft.Extensions.Hosting;
 
 namespace LogAnalyzerBusiness.Worker;
 
-public class LogProcessorWorker(IResultStore resultStore, Channel<(Guid,string)> channel, IParsingService parsingService, IGptService gptService) : BackgroundService
+public class LogProcessorWorker(IResultStore resultStore, Channel<(Guid,string)> channel, IParsingService parsingService, IGptService gptService, IRateLimitService rateLimitService) : BackgroundService
 {
     
 
@@ -24,7 +25,18 @@ public class LogProcessorWorker(IResultStore resultStore, Channel<(Guid,string)>
             try
             {
                 var parsedLogs = parsingService.ParseLogs(logs);
-                var gptSummary = await gptService.AnalyzeLogs(parsedLogs);
+                string gptSummary;
+                
+                await rateLimitService.WaitForSlotAsync();
+                try
+                {
+                    gptSummary = await gptService.AnalyzeLogs(parsedLogs);
+                }
+                finally
+                {
+                    rateLimitService.ReleaseSlot();
+                }
+                
 
                 var metrics = new Dictionary<string, object>
                 {

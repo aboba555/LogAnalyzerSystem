@@ -1,5 +1,6 @@
 using LogAnalyzerBusiness.Services.Gpt;
 using LogAnalyzerBusiness.Services.LogParsing;
+using LogAnalyzerBusiness.Services.RateLimit;
 using LogAnalyzerBusiness.Services.ResultStore;
 using LogAnalyzerBusiness.Worker;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,9 @@ public static class Extension
     {
         services.AddSingleton<IResultStore, ResultStore>();
         services.AddSingleton<IParsingService, ParsingService>();
+        services.AddSingleton<IRateLimitService>(
+            _ => new RateLimitService(maxConcurrentRequests: 3)
+        );
         services.AddHostedService<LogProcessorWorker>();
         return services;
     }
